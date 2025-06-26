@@ -76,19 +76,11 @@ RUN cargo +nightly fmt --check
 
 FROM ${UBI_MINIMAL_BASE_IMAGE}:${UBI_BASE_IMAGE_TAG} AS fms-guardrails-orchestr8-release
 ARG CONFIG_FILE=config/config.yaml
-ARG TARGETARCH
 
 COPY --from=fms-guardrails-orchestr8-builder /app/bin/ /app/bin/
 COPY ${CONFIG_FILE} /app/config/config.yaml
 
-# Install packages based on target architecture
-RUN microdnf install -y --disableplugin=subscription-manager shadow-utils && \
-    if [ "$TARGETARCH" = "amd64" ] || [ "$TARGETARCH" = "x86_64" ]; then \
-        microdnf install -y --disableplugin=subscription-manager compat-openssl11 || \
-        microdnf install -y --disableplugin=subscription-manager openssl; \
-    else \
-        microdnf install -y --disableplugin=subscription-manager openssl; \
-    fi && \
+RUN microdnf install -y --disableplugin=subscription-manager shadow-utils compat-openssl11 && \
     microdnf clean all --disableplugin=subscription-manager
 
 RUN groupadd --system orchestr8 --gid 1001 && \
