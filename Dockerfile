@@ -13,7 +13,9 @@ ENV CARGO_REGISTRIES_CRATES_IO_PROTOCOL=sparse
 
 # Install protoc, no longer included in prost crate
 RUN cd /tmp && \
-    apt update && apt install -y cmake clang libclang-dev curl unzip && \
+    if [ "$TARGETARCH" != "amd64" ] && [ "$TARGETARCH" != "x86_64" ]; then \
+        apt update && apt install -y cmake clang libclang-dev curl unzip; \
+    fi && \
     case "$TARGETARCH" in \
         s390x) \
             curl -L -O https://github.com/protocolbuffers/protobuf/releases/download/v${PROTOC_VERSION}/protoc-${PROTOC_VERSION}-linux-s390_64.zip ;; \
@@ -27,7 +29,6 @@ RUN cd /tmp && \
     unzip protoc-*.zip -d /usr/local && \
     rm protoc-*.zip
 
-# Set LIBCLANG_PATH since libclang-dev is now always installed
 ENV LIBCLANG_PATH=/usr/lib/llvm-14/lib
 
 WORKDIR /app
