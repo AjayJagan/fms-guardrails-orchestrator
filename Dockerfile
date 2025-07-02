@@ -2,7 +2,6 @@ ARG UBI_MINIMAL_BASE_IMAGE=registry.access.redhat.com/ubi9/ubi-minimal
 ARG UBI_BASE_IMAGE_TAG=latest
 ARG PROTOC_VERSION=29.3
 ARG CONFIG_FILE=config/config.yaml
-ARG TARGETARCH
 
 ## Rust builder ################################################################
 # Specific debian version so that compatible glibc version is used
@@ -30,15 +29,12 @@ RUN cd /tmp && \
     unzip protoc-*.zip -d /usr/local && \
     rm protoc-*.zip
 
-# Set LIBCLANG_PATH dynamically based on available paths
-RUN for path in "/usr/lib/llvm-14/lib" "/usr/lib/llvm-13/lib" "/usr/lib/x86_64-linux-gnu" "/usr/lib/aarch64-linux-gnu"; do \
-        if [ -d "$path" ]; then \
-            echo "export LIBCLANG_PATH=$path" >> /etc/environment; \
-            break; \
-        fi; \
-    done
+# Set LIBCLANG_PATH only when libclang-dev is installed (non-x86_64 architectures)
+RUN if [ "$TARGETARCH" != "amd64" ] && [ "$TARGETARCH" != "x86_64" ]; then \
+        echo "export LIBCLANG_PATH=/usr/lib/llvm-14/lib" >> /etc/environment; \
+    fi
 
-ENV LIBCLANG_PATH=${LIBCLANG_PATH:-/usr/lib/llvm-14/lib/}
+ENV LIBCLANG_PATH=${LIBCLANG_PATH:-/usr/lib/llvm-14/lib}
 
 WORKDIR /app
 
