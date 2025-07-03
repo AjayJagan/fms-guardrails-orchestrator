@@ -13,23 +13,26 @@ ENV CARGO_REGISTRIES_CRATES_IO_PROTOCOL=sparse
 
 # Install protoc, no longer included in prost crate
 RUN cd /tmp && \
-    if [ "$TARGETARCH" != "amd64" ] && [ "$TARGETARCH" != "x86_64" ]; then \
-        apt update && apt install -y cmake clang libclang-dev curl unzip; \
+    apt update && apt install -y curl unzip && \
+    if [ "$TARGETARCH" != "amd64" ]; then \
+        apt install -y cmake clang libclang-dev; \
     fi && \
     case "$TARGETARCH" in \
         s390x) \
             curl -L -O https://github.com/protocolbuffers/protobuf/releases/download/v${PROTOC_VERSION}/protoc-${PROTOC_VERSION}-linux-s390_64.zip ;; \
-        arm64|aarch64) \
+        arm64) \
             curl -L -O https://github.com/protocolbuffers/protobuf/releases/download/v${PROTOC_VERSION}/protoc-${PROTOC_VERSION}-linux-aarch_64.zip ;; \
         ppc64le) \
             curl -L -O https://github.com/protocolbuffers/protobuf/releases/download/v${PROTOC_VERSION}/protoc-${PROTOC_VERSION}-linux-ppcle_64.zip ;; \
-        *) \
+        amd64) \
             curl -L -O https://github.com/protocolbuffers/protobuf/releases/download/v${PROTOC_VERSION}/protoc-${PROTOC_VERSION}-linux-x86_64.zip ;; \
+        *) \
+            echo "Unsupported TARGETARCH: $TARGETARCH" >&2; exit 1 ;; \
     esac && \
     unzip protoc-*.zip -d /usr/local && \
     rm protoc-*.zip
 
-ENV LIBCLANG_PATH=/usr/lib/llvm-14/lib
+ENV LIBCLANG_PATH=/usr/lib/llvm-14/lib/
 
 WORKDIR /app
 
