@@ -79,7 +79,7 @@ tonic = { version = "0.12.3", features = [
 tower = { version = "0.5.2", features = ["timeout"] }
 tower-http = { version = "0.6.4", features = ["trace"] }
 tracing = "0.1.41"
-tracing-opentelemetry = "0.28.0"
+tracing-opentelemetry = "0.33.0"
 tracing-subscriber = { version = "0.3.19", features = ["json", "env-filter"] }
 url = "2.5.4"
 uuid = { version = "1.17.0", features = ["v4"] }
