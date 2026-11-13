@@ -5,7 +5,7 @@ ARG CONFIG_FILE=config/config.yaml
 
 ## Rust builder ################################################################
 # Specific debian version so that compatible glibc version is used
-FROM rust:1.87.0 AS rust-builder
+FROM rust:1.100.0 AS rust-builder
 ARG PROTOC_VERSION
 ARG TARGETARCH
 
